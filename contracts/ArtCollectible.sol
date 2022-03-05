@@ -11,10 +11,10 @@ contract ArtCollectible is Ownable, ERC1155 {
 
     constructor()
         ERC1155(
-            'ipfs://QmUusoGauKGU6EsGDLbqPiZK8PEnHDRYHa4c9yvJxhTHcg/{id}.json'
+            'ipfs://QmfH4te5jjEn87rpS3KiM3D8qciXWXxVZP23gfrbSraBVE/{id}.json' // REPLACE THIS WITH ACTUAL IPFS FROM PINATA ONCE UPLOADS ARE DONE
         )
     {
-        setName('Mandelbrot Julia Set Collection');
+        setName('Hooperverse NFT Collection');
     }
 
     function setURI(string memory _newuri) public onlyOwner {
@@ -27,7 +27,6 @@ contract ArtCollectible is Ownable, ERC1155 {
 
     function mintBatch(uint256[] memory ids, uint256[] memory amounts)
         public
-        onlyOwner
     {
         _mintBatch(msg.sender, ids, amounts, '');
     }
