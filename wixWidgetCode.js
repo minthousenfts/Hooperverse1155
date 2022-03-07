@@ -7,17 +7,17 @@ const H3_2_TEXT = 'Explore this code and use it as a reference to create your ow
 const DEBUG_TEXT = 'Loading the code for Custom Element \'wix-default-custom-element\'. To debug this code, open wixDefaultCustomElement.js in Developer Tools.';
 
 // make the magic happen right here: 
-const checkIfWalletIsConnected = () => {
-    // try accessing window.ethereum
-    const { ethereum } = window
+// const checkIfWalletIsConnected = () => {
+//     // try accessing window.ethereum
+//     const { ethereum } = window
 
-    if (!ethereum) {
-        alert("You don't have metamask!")
-        return;
-    } else { 
-        console.log("Ethereum found", ethereum)
-    }
-}
+//     if (!ethereum) {
+//         alert("You don't have metamask!")
+//         return;
+//     } else { 
+//         console.log("Ethereum found", ethereum)
+//     }
+// }
 
 
 const createImage = () => {
