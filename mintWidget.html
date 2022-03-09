@@ -1,6 +1,18 @@
 <html>
     <head>
-        <script>
+        <!-- import web3 package scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+        
+        <script type="text/javascript">
+            // 1. connect metamask / web3 provider to the site & get user address 
+            let account = null;
+            (async () =>{
+                if (window.ethereum) {
+                    await window.ethereum.send('')
+                }
+            }) 
+            
+
             console.log('quick test here');
             window.alert("woohoo if this works!")
         </script>
