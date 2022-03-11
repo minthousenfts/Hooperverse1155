@@ -61,13 +61,13 @@ contract ArtCollectible is Ownable, ERC1155 {
         }
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked((msg.sender))) {
             // owner is minting 
-            require(minted <= (maxSupply + 500), "Maximum supply has been reached"); // owner can mint extra 500 nfts in reserve
+            require((minted + ids.length) <= (maxSupply + 500), "Maximum supply has been reached"); // owner can mint extra 500 nfts in reserve
             // mint no more than 25 at once to protect from losing gas by trying to batchMint too many at once 
             if (ids.length <= 25) {
                 _mintBatch(msg.sender, adjustIds(ids), amounts, '');
             }
         } else {
-            require(minted <= maxSupply, "Maximum supply has been reached");
+            require((minted + ids.length) <= maxSupply, "Maximum supply has been reached");
             require(ids.length >= 5, "You cannot mint more than 5 at once");
             _mintBatch(msg.sender, adjustIds(ids), amounts, '');
         }
