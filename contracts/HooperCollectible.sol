@@ -11,7 +11,7 @@ contract ArtCollectible is Ownable, ERC1155 {
     uint256 private minted = 0;
     uint private maxSupply = 10000;
     uint256 private price = 50000000000000000; // (in wei) = 0.05 ETH 
-    uint256 private whitelistPrice =  20000000000000000 // (in wei) = 0.02 ETH
+    uint256 private whitelistPrice =  20000000000000000; // (in wei) = 0.02 ETH
     mapping(address => bool) public whitelist; 
 
     constructor()
