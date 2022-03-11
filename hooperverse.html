@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>A Basic HTML5 Template</title>
+    <meta name="description" content="A simple HTML5 Template for new projects.">
+    <meta name="author" content="SitePoint">
+    <meta property="og:title" content="A Basic HTML5 Template">
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js">
+        const CONTRACT_ADDRESS = '0x93D875f0D636b530A16A7667dE54246CCe85462B';
+        const ABI = artifacts.require('MainHooper');
+    </script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="text/javascript">
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+        function returnConnectedContract() {
+            return connectedContract;
+        }
+
+    </script>
+
+    <script type="text/javascript">
+
+        let account = null;
+        let hooperverse = null;
+
+        async function askContractToMintNft() {
+
+            console.log('hellooo fazall');
+
+            try {
+                const { ethereum } = window;
+
+                if (ethereum) {
+                    console.log('ethereum object exists')
+
+                    console.log("Going to pop wallet now to pay gas...")
+
+                    
+
+                    let nftTxn = await returnConnectedContract().mint();
+
+                    console.log("Mining...please wait.")
+                    await nftTxn.wait();
+                    
+                    console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`);
+
+                } else {
+                    console.log("Ethereum object doesn't exist!");
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+
+    <div>
+        <p>Wallet Address: <span id="wallet-address"></span></p>
+        <button id="mint-nft" onClick="askContractToMintNft();">Mint an NFT</button>
+    </div>
+
+    
+</body>
+</html>
