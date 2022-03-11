@@ -59,7 +59,7 @@ contract ArtCollectible is Ownable, ERC1155 {
         } else {
             require(msg.value >= (price * ids.length), "You do not have enough Ether to Purchase these items");
         }
-        if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked((msg.sender))) {
+        if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
             // owner is minting 
             require((minted + ids.length) <= (maxSupply + 500), "Maximum supply has been reached"); // owner can mint extra 500 nfts in reserve
             // mint no more than 25 at once to protect from losing gas by trying to batchMint too many at once 
@@ -74,16 +74,16 @@ contract ArtCollectible is Ownable, ERC1155 {
     }
 
     function mint(uint256 id, uint256 amount) public payable {
-        if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked((msg.sender))) {
+        if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
             require(minted <= maxSupply + 500, "Maximum supply has been reached"); // owner can mint up to 500 extra reserves
         } else {
             require(minted <= maxSupply, "Maximum supply has been reached"); 
         }
         if (whitelist[msg.sender]) {
             // they're whitelisted, mint for whitelistprice 
-            require(msg.value >= (whitelistPrice * ids.length), "You do not have enough Ether to Purchase these items");
+            require(msg.value >= (whitelistPrice), "You do not have enough Ether to Purchase these items");
         } else {
-            require(msg.value >= (price * ids.length), "You do not have enough Ether to Purchase these items");
+            require(msg.value >= (price), "You do not have enough Ether to Purchase these items");
         }
         _mint(msg.sender, (id + minted), amount, '');
         minted++;
