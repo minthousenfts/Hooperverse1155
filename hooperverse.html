@@ -9,25 +9,22 @@
     <meta name="description" content="A simple HTML5 Template for new projects.">
     <meta name="author" content="SitePoint">
     <meta property="og:title" content="A Basic HTML5 Template">
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js">
         const CONTRACT_ADDRESS = '0x93D875f0D636b530A16A7667dE54246CCe85462B';
         const ABI = artifacts.require('MainHooper');
-    </script>
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="text/javascript">
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
-        function returnConnectedContract() {
-            return connectedContract;
-        }
 
-    </script>
-
-    <script type="text/javascript">
-        window.addEventListener('load', function () {
+        window.addEventListener('load', () => {
             if (window.ethereum) {
                 window.web3 = new Web3(ethereum);
+
+                const provider = new ethers.providers.Web3Provider(ethereum);
+                console.log(provider);
+                const signer = provider.getSigner();
+                const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+
                 ethereum.enable()
                     .then(() => {
                         console.log("Ethereum enabled");
@@ -49,42 +46,109 @@
             } else {
                 console.log("Non-Ethereum browser detected. You should consider installing MetaMask.");
             }
-        });
+            let account = null;
+            let hooperverse = null;
 
+            async function askContractToMintNft() {
 
-        let account = null;
-        let hooperverse = null;
+                console.log('hellooo fazall');
 
-        async function askContractToMintNft() {
+                try {
+                    const { ethereum } = window;
 
-            console.log('hellooo fazall');
+                    if (ethereum) {
 
-            try {
-                const { ethereum } = window;
+                        const provider = new ethers.providers.Web3Provider(ethereum);
+                        const signer = provider.getSigner();
+                        const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, myEpicNft.abi, signer);
 
-                if (ethereum) {
-                    console.log('ethereum object exists')
+                        console.log("Going to pop wallet now to pay gas...")
+                        let nftTxn = await connectedContract.makeAnEpicNFT();
 
-                    console.log("Going to pop wallet now to pay gas...")
+                        console.log("Mining...please wait.")
+                        await nftTxn.wait();
+                        
+                        console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`);
 
-                    
-
-                    let nftTxn = await returnConnectedContract().mint();
-
-                    console.log("Mining...please wait.")
-                    await nftTxn.wait();
-                    
-                    console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`);
-
-                } else {
-                    console.log(window);
-                    console.log(window.ethereum);
-                    console.log("Ethereum object doesn't exist!");
+                    } else {
+                        console.log(window);
+                        console.log(window.ethereum);
+                        console.log("Ethereum object doesn't exist!");
+                    }
+                } catch (error) {
+                    console.log(error)
                 }
-            } catch (error) {
-                console.log(error)
             }
-        }
+        });
+    </script>
+    </script>
+    <script type="text/javascript">
+
+        // window.addEventListener('load', () => {
+        //     if (window.ethereum) {
+        //         window.web3 = new Web3(ethereum);
+
+        //         const provider = new ethers.providers.Web3Provider(ethereum);
+        //         console.log(provider);
+        //         const signer = provider.getSigner();
+        //         const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+
+        //         ethereum.enable()
+        //             .then(() => {
+        //                 console.log("Ethereum enabled");
+
+        //                 web3.eth.getAccounts(function (err, acc) {
+        //                     if (err != null) {
+        //                         self.setStatus("There was an error fetching your accounts");
+        //                         return;
+        //                     }
+        //                     if (acc.length > 0) {
+        //                         console.log(acc);
+        //                     }
+        //                 });
+        //             })
+        //             .catch(() => {
+        //                 console.warn('User didn\'t allow access to accounts.');
+        //                 waitLogin();
+        //             });
+        //     } else {
+        //         console.log("Non-Ethereum browser detected. You should consider installing MetaMask.");
+        //     }
+        //     let account = null;
+        //     let hooperverse = null;
+
+        //     async function askContractToMintNft() {
+
+        //         console.log('hellooo fazall');
+
+        //         try {
+        //             const { ethereum } = window;
+
+        //             if (ethereum) {
+
+        //                 const provider = new ethers.providers.Web3Provider(ethereum);
+        //                 const signer = provider.getSigner();
+        //                 const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, myEpicNft.abi, signer);
+
+        //                 console.log("Going to pop wallet now to pay gas...")
+        //                 let nftTxn = await connectedContract.makeAnEpicNFT();
+
+        //                 console.log("Mining...please wait.")
+        //                 await nftTxn.wait();
+                        
+        //                 console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`);
+
+        //             } else {
+        //                 console.log(window);
+        //                 console.log(window.ethereum);
+        //                 console.log("Ethereum object doesn't exist!");
+        //             }
+        //         } catch (error) {
+        //             console.log(error)
+        //         }
+        //     }
+        // });
     </script>
 
 </head>
