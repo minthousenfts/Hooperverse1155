@@ -8,11 +8,13 @@ contract ArtCollectible is Ownable, ERC1155 {
     // Base URI
     string private baseURI;
     string public name;
-    uint256 private minted = 0;
+    uint256 private minted;
     uint private maxSupply = 10000;
-    uint256 private price = 50000000000000000; // (in wei) = 0.05 ETH 
+    uint256 private price = 50000000000000000; // (in wei) = 0.05 ETH 50000000000000000
     uint256 private whitelistPrice =  20000000000000000; // (in wei) = 0.02 ETH
     mapping(address => bool) public whitelist; 
+
+    event Log(uint8[2], string); 
 
     constructor()
         ERC1155(
@@ -42,38 +44,66 @@ contract ArtCollectible is Ownable, ERC1155 {
         whitelist[user] = isWhitelisted;
     } // require(whitelist[msg.sender], "You're not whitelisted."); 
 
-    function adjustIds(uint256[] memory ids) private returns(uint256[] memory) {
-        // add `minted` to every id 
-        // (i.e. when minted=50: [1,2,3,4,5] => [51,52,53,54,55]
-        for (uint i=0; i < ids.length; i++) {
-            ids[i] = minted + i + 1;
-        }
-        minted += ids.length;
-        return ids;
-    }
+    // function calcParams(uint256 amount) private returns(uint256[][2] memory) {
+    //     // add `minted` to every id 
+    //     // (i.e. when minted=50: [1,2,3,4,5] => [51,52,53,54,55]
+    //     uint256[] memory ids;
+    //     uint256[] memory amounts;
+    //     for (uint i=0; i < amount; i++) {
+    //         ids[i] = minted + i + 1; 
+    //         amounts[i] = 1;
+    //     }
+    //     minted += amount;
+    //     return [ids, amounts];
+    // }
 
-    function mintBatch(uint256[] memory ids, uint256[] memory amounts) payable public {
+    function mintBatch(uint256 amount) external payable {
         if (whitelist[msg.sender]) {
-            // they're whitelisted, mint for whitelistprice 
-            require(msg.value >= (whitelistPrice * ids.length), "You do not have enough Ether to Purchase these items");
+            // they're whitelisted, mint for whitelistprice
+            require(msg.value >= (whitelistPrice * amount), "You do not have enough Ether to Purchase these items");
         } else {
-            require(msg.value >= (price * ids.length), "You do not have enough Ether to Purchase these items");
+            require(msg.value >= (price * amount), "You do not have enough Ether to Purchase these items");
         }
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
             // owner is minting 
-            require((minted + ids.length) <= (maxSupply + 500), "Maximum supply has been reached"); // owner can mint extra 500 nfts in reserve
+            require((minted + amount) <= (maxSupply + 500), "Maximum supply has been reached"); // owner can mint extra 500 nfts in reserve
             // mint no more than 25 at once to protect from losing gas by trying to batchMint too many at once 
-            if (ids.length <= 25) {
-                _mintBatch(msg.sender, adjustIds(ids), amounts, '');
+            if (amount <= 25) {
+                // calculate ids & amounts, per the number of NFTs specified
+                uint256[] memory ids = new uint256[](amount);
+                uint256[] memory amounts = new uint256[](amount);
+                for (uint256 i=0; i < amount; i++) {
+                    ids[i] = minted + i + 1; 
+                    amounts[i] = 1;
+                }
+                minted += amount;
+                // uint256[] memory ids = new uint256[](3);
+                // ids[0] = 1;
+                // ids[1] = 2;
+                // ids[2] = 3;
+                // uint256[] memory amounts = new uint256[](3);
+                // amounts[0] = 1;
+                // amounts[1] = 1;
+                // amounts[2] = 1;
+                _mintBatch(msg.sender, ids, amounts, '');
             }
         } else {
-            require((minted + ids.length) <= maxSupply, "Maximum supply has been reached");
-            require(ids.length >= 5, "You cannot mint more than 5 at once");
-            _mintBatch(msg.sender, adjustIds(ids), amounts, '');
+            require((minted + amount) <= maxSupply, "Maximum supply has been reached");
+            require(amount >= 5, "You cannot mint more than 5 at once");
+            // calculate ids & amounts, per the number of NFTs specified
+            uint256[] memory ids;
+            uint256[] memory amounts;
+            for (uint256 i=0; i < amount; i++) {
+                ids[i] = minted + i + 1; 
+                amounts[i] = 1;
+            }
+            minted += amount;
+            _mintBatch(msg.sender, ids, amounts, '');
         }
     }
 
-    function mint(uint256 id, uint256 amount) public payable {
+    // no need for input parameters because we're always minting 1x NFT of ID minted+1
+    function mint() external payable {
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
             require(minted <= maxSupply + 500, "Maximum supply has been reached"); // owner can mint up to 500 extra reserves
         } else {
@@ -85,7 +115,7 @@ contract ArtCollectible is Ownable, ERC1155 {
         } else {
             require(msg.value >= (price), "You do not have enough Ether to Purchase these items");
         }
-        _mint(msg.sender, (id + minted), amount, '');
+        _mint(msg.sender, (1 + minted), 1, '');
         minted++;
     }
 
