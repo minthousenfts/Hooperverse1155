@@ -4,6 +4,113 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .body-wrap {
+            display: inline-block;
+        }
+
+        .error-display {
+            background-color: rgba(206, 0, 0, 0.89) !important;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            transform: translateY(100%);
+            padding: 5px 10px;
+            padding-bottom: 7px;
+            font-size: 12px;
+            text-transform: capitalize;
+            width: 100%;
+            border-radius: 0 5px 5px 5px !important;
+        }
+
+        .nft-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            font-family: sans-serif;
+            margin-left:0;
+            background-color: black;
+            transition: all 0.2s;
+            padding: 4px 0px 4px 25px;
+            margin: 10px 20px;
+            overflow: visible;
+        }
+        .nft-wrapper:hover {
+            background-color: rgb(27, 27, 27);
+        }
+
+        .num-inputs-wrapper {
+            margin-left: 10px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            /* padding: 0px 10px;  */
+            cursor: pointer;
+        }
+        .num-inputs-wrapper span {
+            display: flex;
+            text-align: center;
+            justify-content: center;
+            flex-direction: column-reverse;
+            margin: 4px;
+            height: 20px; 
+            width: 20px;
+            border-radius: 2px;
+            transition: all 0.2s;
+            /* background-color: red !important; */
+        }
+        .num-inputs-wrapper *:hover {
+            background-color: white;
+            color: black
+        }
+        
+        .nft-wrapper * {
+            color: white;
+            border-radius: 0;
+            border: 0px solid;
+            background-color: transparent;
+        }
+
+        .nft-btn {
+            padding: 15px 25px;
+            float: left;
+            text-transform: uppercase;
+            font-size: 16px;
+            letter-spacing: 1.5px;
+            font-weight: bolder;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .nft-btn:hover {
+            letter-spacing: 2.4px;
+        }
+        .price-display {
+            position: absolute;
+            opacity: 0.3;
+            color: white;
+            left: 50%;
+            top: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            font-size: 80px;
+        }
+
+        input[type="number"] {
+            -webkit-appearance: textfield;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+        }
+
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js">
     </script>
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="text/javascript">
@@ -23322,6 +23429,10 @@
         let account = null; 
 
         window.addEventListener('load', () => {
+            // starting state for visual elements
+            document.getElementById("eth-price").innerHTML = 0.05;
+            document.getElementById("error-msg").style.display = "none";
+
             if (window.ethereum) {
                 window.web3 = new Web3(ethereum);
 
@@ -23343,7 +23454,6 @@
                             }
                             if (acc.length > 0) {
                                 account = acc[0]; // got the account address 
-                                document.getElementById("wallet-address").innerHTML = account;
                                 console.log("Using account: " + acc);
                             }
                         });
@@ -23364,6 +23474,7 @@
             document.getElementById("mint-nft").disabled = true; // disable button
             error = document.getElementById("error-msg");
             error.innerHTML = " ";
+            error.style.display = "none";
             amount = (document.getElementById("mint-amount").value || 1);
             console.log(amount + " NFTs requested");
             
@@ -23404,6 +23515,7 @@
                             console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`);
 
                             document.getElementById("mint-nft").disabled = false; // make button available again
+                            error.style.display = "none";
                         }
 
                     } else {
@@ -23412,15 +23524,35 @@
                         console.log("Ethereum object doesn't exist!");
                         document.getElementById("mint-nft").disabled = false;
                         error.innerHTML = "Wallet Not Connected"
+                        error.style.display = "block";
                     }
                 } else {
                     error.innerHTML = "Cannot Mint This Number"
+                    error.style.display = "block";
                     document.getElementById("mint-nft").disabled = false;
                 }
             } catch (err) {
                 console.log(err);
-                error.innerHTML = "Likely insufficient funds or rejected transaction.<br/> Check console for more or contact support";
+                error.innerHTML = "Likely insufficient funds or rejected transaction. Check console for more or contact support";
+                error.style.display = "block";
                 document.getElementById("mint-nft").disabled = false;
+            }
+        }
+
+        function incrementCount() {
+            amount = document.getElementById("mint-amount").value
+            if (amount < 5) {
+                // increment
+                document.getElementById("mint-amount").value = 1 + parseInt(amount);
+                console.log(amount, parseInt(amount), ((parseInt(amount) + 1) * 0.05))
+                document.getElementById("eth-price").innerHTML = Math.round((parseInt(amount) + 1) * 0.05 * 100) / 100; //using math.round to get only 2dp to display correctly
+            }
+        }
+        function decrementCount() {
+            amount = document.getElementById("mint-amount").value
+            if (amount > 1) {
+                document.getElementById("mint-amount").value = parseInt(amount) - 1;
+                document.getElementById("eth-price").innerHTML = Math.round((parseInt(amount) - 1) * 0.05 * 100) / 100; //using math.round to get only 2dp to display correctly
             }
         }
     </script>
@@ -23429,11 +23561,19 @@
 
 <body>
 
-    <div>
-        <p>Connected Wallet: <span id="wallet-address"></span></p>
-        <input type="number" value="1" id="mint-amount" min="1" max="5" placeholder="1">
-        <button id="mint-nft" onClick="askContractToMintNft();">Mint a Hooper</button>
-        <span id="error-msg"></span>
+    <div class="body-wrap">
+        <div class="nft-wrapper">
+            <input type="number" value="1" id="mint-amount" min="1" max="5" placeholder="1">
+            <div class="num-inputs-wrapper">
+                <span class="num-input" id="" onClick="incrementCount();">+</span>
+                <span class="num-input" id="" onClick="decrementCount();">-</span>
+            </div>
+            <button class="nft-btn" id="mint-nft" onClick="askContractToMintNft();">
+                <span class="price-display" id="eth-price"></span>
+                Mint Hoopers
+            </button>
+            <span class="error-display show" id="error-msg"></span>
+        </div>
     </div>
 
     
