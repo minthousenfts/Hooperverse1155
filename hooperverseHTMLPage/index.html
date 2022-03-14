@@ -24,8 +24,8 @@
             padding-bottom: 7px;
             font-size: 12px;
             text-transform: capitalize;
-            width: 100%;
-            border-radius: 0 5px 5px 5px !important;
+            width: calc(100% - 20px);
+            border-radius: 0 0px 5px 5px !important;
         }
 
         .nft-wrapper {
@@ -81,6 +81,7 @@
             float: left;
             text-transform: uppercase;
             font-size: 16px;
+            min-width: 210px;
             letter-spacing: 1.5px;
             font-weight: bolder;
             cursor: pointer;
@@ -97,7 +98,7 @@
             left: 50%;
             top: 50%;
             transform: translateX(-50%) translateY(-50%);
-            font-size: 80px;
+            font-size: 100px;
         }
 
         input[type="number"] {
@@ -23471,6 +23472,7 @@
         async function askContractToMintNft() {
 
             console.log('STARTING MINT');
+            document.getElementById("mint-nft-text").innerHTML = "Minting";
             document.getElementById("mint-nft").disabled = true; // disable button
             error = document.getElementById("error-msg");
             error.innerHTML = " ";
@@ -23495,27 +23497,32 @@
                                 value: ethers.utils.parseEther("0.05")
                             })
 
+                            error.innerHTML = "Mining now..."
+                            error.style.display = "block";
                             console.log("Mining...");
+
                             await nftTxn.wait();
                             
-                            console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`);
-
                             document.getElementById("mint-nft").disabled = false; // make button available again
-                            
+                            error.innerHTML = "Mined! Transaction <a href=\"https://rinkeby.etherscan.io/tx/" + nftTxn.hash + "\">here</a>";
+                            document.getElementById("mint-nft-text").innerHTML = "Mint hoopers"
                         } else {
+                            
                             // use mintbatch method 
                             console.log("amount: " + (amount * 0.05).toString())
                             let nftTxn = await connectedContract.mintBatch(amount, {
                                 value: ethers.utils.parseEther((amount * 0.05).toString())
                             })
 
+                            error.innerHTML = "Mining now..."
+                            error.style.display = "block";
                             console.log("Mining...");
+
                             await nftTxn.wait();
                             
-                            console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`);
-
                             document.getElementById("mint-nft").disabled = false; // make button available again
-                            error.style.display = "none";
+                            error.innerHTML = "Mined! Transaction <a href=\"https://rinkeby.etherscan.io/tx/" + nftTxn.hash + "\">here</a>";
+                            document.getElementById("mint-nft-text").innerHTML = "Mint hoopers"
                         }
 
                     } else {
@@ -23523,6 +23530,7 @@
                         console.log(window.ethereum);
                         console.log("Ethereum object doesn't exist!");
                         document.getElementById("mint-nft").disabled = false;
+                        document.getElementById("mint-nft-text").innerHTML = "Mint hoopers"
                         error.innerHTML = "Wallet Not Connected"
                         error.style.display = "block";
                     }
@@ -23530,12 +23538,14 @@
                     error.innerHTML = "Cannot Mint This Number"
                     error.style.display = "block";
                     document.getElementById("mint-nft").disabled = false;
+                    document.getElementById("mint-nft-text").innerHTML = "Mint hoopers"
                 }
             } catch (err) {
                 console.log(err);
                 error.innerHTML = "Likely insufficient funds or rejected transaction. Check console for more or contact support";
                 error.style.display = "block";
                 document.getElementById("mint-nft").disabled = false;
+                document.getElementById("mint-nft-text").innerHTML = "Mint hoopers"
             }
         }
 
@@ -23570,9 +23580,9 @@
             </div>
             <button class="nft-btn" id="mint-nft" onClick="askContractToMintNft();">
                 <span class="price-display" id="eth-price"></span>
-                Mint Hoopers
+                <span id="mint-nft-text">Mint Hoopers</span>
             </button>
-            <span class="error-display show" id="error-msg"></span>
+            <span class="error-display" id="error-msg"></span>
         </div>
     </div>
 
