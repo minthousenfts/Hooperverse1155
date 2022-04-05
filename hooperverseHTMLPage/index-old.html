@@ -5,139 +5,168 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+
         :root {
             /* violet */
             --primary-color: 111, 76, 255;
             
             /* white */
-            --text-color: white;
+            --text-color: 256, 256, 256;
         }
 
-        @font-face {
-            font-family: 'axion_rndregular';
-            src: url('./fonts/axion_rnd-webfont.woff2') format('woff2'),
-                url('./fonts/axion_rnd-webfont.woff') format('woff');
-            font-weight: normal;
-            font-style: normal;
-
-        }
-
-        body {
-            font-family: "axion_rndregular", Arial, Helvetica, sans-serif;
-            /* text-align: center; */
-            color: white;
+        * {
+            margin: 0;
+            padding: 0;
         }
 
         .body-wrap {
             display: inline-block;
-            background: rgba(18, 79, 163, 0.5);
-            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .body-wrap-2 {
+            display: inline-block;
+            overflow: hidden;
         }
 
         .minting-wrapper {
-            margin: 10px 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-evenly;
+            position: relative;
+            display: table;
+            align-items: center;
+            align-content: center;
+            text-align: center;
+            font-family: sans-serif;
+            margin-left:0;
+            background-color:rgba(111, 76, 255, 0.25);
+            transition: all 0.2s;
+            overflow: visible;
+            width: 150px;
+            height: 50px;
         }
 
-        .mint-hoopers-title {
-            display: flex;
-            justify-content: center;
-            text-transform: uppercase;
-        }
-
-        .change-num-to-mint {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-evenly;
-            margin: 20px;
-        }
-
-        .mint-price {
-            
-        }
-
-        .add-or-subtract {
-            transition: all 0.3s;
-            /* color: white; */
-            color: rgb(255, 255, 255, 0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            border-radius: 20px;
-            font-size: 32px;
-        }
-
-        .add-or-subtract:hover {
-            transition: all 0.3s;
-            /* color: rgb(255, 255, 255, 0.5); */
-            color: white;
-            cursor: pointer;
-        }
-
-        .num-minting {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            font-size: 25px;
-            font-weight: bold;
-        }
-
-        .button-wrapper {
-            display: flex;
-            justify-content: center;
-            margin: 10px;
-        }
-
-        .button-wrapper * {
-            text-transform: uppercase;
-            font-weight: bold;
-            /* letter-spacing: 1px; */
-        }
-
-        .btn {
-            font-family: "axion_rndregular", Arial, Helvetica, sans-serif;
-            font-size: 18px;
-            padding: 12px 64px;
-            margin: 1rem;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            border-radius: 50px;
-        }
-
-        .btn:hover {
-            transition: all 0.3s ease;
+        .minting-wrapper:hover {
         }
 
         .btn-semi-transparent {
-            margin: 10px;
-            background-color: rgba(var(--primary-color), 0.15);
-            border: 1px solid rgba(var(--primary-color), 0.25);
+            /* background-color: rgba(var(--primary-color), 0.15); */
+            /* border: 1px solid rgba(var(--primary-color), 0.25); */
             color: rgba(var(--text-color), 0.8);
+            width: 100%;
+            height: 50px;
+            background-color: transparent;
+            border: 0;
+            padding: 0px 20px;
         }
-
-        .btn-semi-transparent:hover {
-            background-color: rgba(var(--primary-color), 0.35);
-            border: 1px solid rgba(var(--primary-color), 0.5);
-            color: rgba(var(--text-color), 0.9);
-        } 
-
         
-        .btn-glow:hover {
+        .btn-semi-transparent:hover {
+            transition: all 0.3s ease;
             box-shadow: rgba(var(--primary-color), 0.5) 0px 0px 20px 0px;
         }
 
-        .num-minted {
-            display: flex;
-            justify-content: center;
-            margin: 10px;
+        .button-wrapper {
         }
 
-        .total-mint-price {
+        .num-inputs-wrapper-2 {
             display: flex;
+            justify-content: space-evenly;
+            padding: 15px 10px;
+        }
+
+        .error-display {
+            background-color: rgba(206, 0, 0, 0.89) !important;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            transform: translateY(100%);
+            padding: 5px 10px;
+            padding-bottom: 7px;
+            font-size: 12px;
+            text-transform: capitalize;
+            width: calc(100% - 20px);
+            border-radius: 0 0px 5px 5px !important;
+        }
+
+        .nft-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            font-family: sans-serif;
+            margin-left:0;
+            background-color: black;
+            transition: all 0.2s;
+            padding: 0px 0px 0px 25px;
+            overflow: visible;
+        }
+        .nft-wrapper:hover {
+            background-color: rgb(27, 27, 27);
+        }
+
+        .num-inputs-wrapper {
+            margin-left: 10px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            /* padding: 0px 10px;  */
+            cursor: pointer;
+        }
+        .num-inputs-wrapper span {
+            display: flex;
+            text-align: center;
             justify-content: center;
+            flex-direction: column-reverse;
+            margin: 4px;
+            height: 20px; 
+            width: 20px;
+            border-radius: 2px;
+            transition: all 0.2s;
+            /* background-color: red !important; */
+        }
+        .num-inputs-wrapper *:hover {
+            background-color: white;
+            color: black
+        }
+        
+        .nft-wrapper * {
+            color: white;
+            border-radius: 0;
+            border: 0px solid;
+            background-color: transparent;
+        }
+
+        .nft-btn {
+            padding: 20px 25px;
+            float: left;
+            text-transform: uppercase;
+            font-size: 16px;
+            min-width: 210px;
+            letter-spacing: 1.5px;
+            font-weight: bolder;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .nft-btn:hover {
+            letter-spacing: 2.4px;
+        }
+        .price-display {
+            position: absolute;
+            opacity: 0.3;
+            color: white;
+            left: 50%;
+            top: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            font-size: 100px;
+        }
+
+        input[type="number"] {
+            -webkit-appearance: textfield;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
         }
 
     </style>
@@ -23455,13 +23484,9 @@
             ]
         }
 
-        // minting variables 
-        let numToMint = 1;
-        let mintPrice = 0.09;
-        let totalMintPrice = 0.09;
-
         // connect to injected web3 provider 
         let account = null; 
+
         window.addEventListener('load', () => {
             // starting state for visual elements
             document.getElementById("eth-price").innerHTML = 0.05;
@@ -23500,15 +23525,13 @@
                 console.log("Non-Ethereum browser detected. You should consider installing MetaMask.");
             }
         });
-        // finished connecting to web3 provider 
-        console.log('Successfully attempted to connect to web3 wallet ');
 
-        
+        console.log('test');
         async function askContractToMintNft() {
 
             console.log('STARTING MINT');
             document.getElementById("mint-nft-text").innerHTML = "Minting";
-            document.getElementById("mint-nft-text").disabled = true; // disable button
+            document.getElementById("mint-nft").disabled = true; // disable button
             error = document.getElementById("error-msg");
             error.innerHTML = " ";
             error.style.display = "none";
@@ -23607,52 +23630,6 @@
 <body>
 
     <div class="body-wrap">
-
-        <div class="minting-wrapper">
-
-            <h2 class="mint-hoopers-title">Mint Your Hoopers</h2>
-
-            <div class="change-num-to-mint">
-                <div class="add-or-subtract">
-                    <!-- <span class="num-input" onclick="incrementCount();">-</span> -->
-                    <i class="fa fa-minus-circle" onclick="decrementCount()"></i>
-                    <span></span>
-                </div>
-
-                <div class="num-minting">
-                    <!-- <input type="number" value="1" id="mint-amount" min="1" max="5" placeholder="1" disabled> -->
-                    <span id="num-to-mint">1</span>
-                </div>
-
-                <div class="add-or-subtract">
-                    <!-- <span class="num-input" onclick="decrementCount();">+</span> -->
-                    <span><i class="fa fa-plus-circle" onclick="incrementCount()"></i></span>
-                </div>
-            </div>
-
-            <div class="mint-price">
-                Price is 0.09 ETH. Mint up to 10 Hoopers.
-            </div>
-
-            <div class="button-wrapper">
-                <button class="btn btn-semi-transparent btn-glow" id="mint-nft-text">
-                    Mint
-                </button>
-            </div>
-
-            <div class="total-mint-price">
-                <i>Total price:&nbsp;<strong><span id="total-mint-price-ETH">0.09</span>&nbsp;ETH</strong></i>
-            </div>
-
-            <div class="num-minted">
-                <span id="num-minted">0</span>/10000 Minted
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- <div class="body-wrap">
         <div class="nft-wrapper">
             <input type="number" value="1" id="mint-amount" min="1" max="5" placeholder="1">
             <div class="num-inputs-wrapper">
@@ -23688,9 +23665,7 @@
 
         </div>
 
-    </div> -->
-
-    
+    </div>
 
     
 </body>
