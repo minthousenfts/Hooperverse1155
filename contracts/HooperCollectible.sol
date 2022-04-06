@@ -4,14 +4,14 @@ pragma solidity >=0.7.0 <0.9.0;
 import '@openzeppelin/contracts/token/ERC1155/ERC1155.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 
-contract ArtCollectible is Ownable, ERC1155 {
+contract HooperCollectible is Ownable, ERC1155 {
     // Base URI
     string private baseURI;
     string public name;
-    uint256 private minted;
+    uint256 public minted;
     uint private maxSupply = 10000;
-    uint256 private price = 50000000000000000; // (in wei) = 0.05 ETH 50000000000000000
-    uint256 private whitelistPrice =  20000000000000000; // (in wei) = 0.02 ETH
+    uint256 private price = 90000000000000000; // (in wei) = 0.05 ETH 50000000000000000
+    uint256 private whitelistPrice =  80000000000000000; // (in wei) = 0.02 ETH
     mapping(address => bool) public whitelist; 
 
     event Log(uint8[2], string); 
@@ -55,7 +55,7 @@ contract ArtCollectible is Ownable, ERC1155 {
             // owner is minting, they can mint up to 500 extra 
             require((minted + amount) <= (maxSupply + 500), "Maximum supply has been reached"); // owner can mint extra 500 nfts in reserve
             // mint no more than 25 at once to protect from losing gas by trying to batchMint too many at once 
-            if (amount <= 25) {
+            if (amount <= 10) {
                 // calculate ids & amounts, per the number of NFTs specified
                 uint256[] memory ids = new uint256[](amount);
                 uint256[] memory amounts = new uint256[](amount);
@@ -68,7 +68,7 @@ contract ArtCollectible is Ownable, ERC1155 {
             }
         } else {
             require((minted + amount) <= maxSupply, "Maximum supply has been reached");
-            require(amount <= 5, "You cannot mint more than 5 at once");
+            require(amount <= 10, "You cannot mint more than 10 at once");
             // calculate ids & amounts, per the number of NFTs specified
             uint256[] memory ids = new uint256[](amount);
                 uint256[] memory amounts = new uint256[](amount);
