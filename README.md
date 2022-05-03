@@ -1,15 +1,6 @@
-# Basic Sample Hardhat Project
+# Hooperverse NFT Collection 
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+- ERC1155 
+- Max supply 9999
+- Owners can mint 500 more 
+- Users can mint up to 10 at once
