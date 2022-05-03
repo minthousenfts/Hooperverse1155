@@ -9,7 +9,7 @@ contract HooperCollectible is Ownable, ERC1155 {
     string private baseURI;
     string public name;
     uint256 public minted;
-    uint private maxSupply = 10000;
+    uint private maxSupply = 9999;
     uint256 private price = 90000000000000000; // (in wei) = 0.09 ETH 50000000000000000 
     uint256 private whitelistPrice =  80000000000000000; // (in wei) = 0.08 ETH
     mapping(address => bool) public whitelist; 
