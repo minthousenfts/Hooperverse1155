@@ -13,6 +13,7 @@ contract HooperCollectible is Ownable, ERC1155 {
     uint256 private price = 90000000000000000; // (in wei) = 0.09 ETH 50000000000000000 
     uint256 private whitelistPrice =  80000000000000000; // (in wei) = 0.08 ETH
     mapping(address => bool) public whitelist; 
+    mapping(address => uint256) public whitelistTier;
 
     event Log(uint8[2], string); 
 
@@ -44,13 +45,75 @@ contract HooperCollectible is Ownable, ERC1155 {
         whitelist[user] = isWhitelisted;
     } // require(whitelist[msg.sender], "You're not whitelisted."); 
 
+    function updateTier(address user, uint256 tier) public onlyOwner {
+        whitelistTier[user] = tier;
+    }
+
+    function getTier(address user) public {
+
+        require(whitelistTier[user] != 0, "You are not whitelisted.");
+
+        return whitelistTier[user];
+    }
+
+
     function mintBatch(uint256 amount) external payable {
-        if (whitelist[msg.sender]) {
-            // they're whitelisted, mint for whitelistprice
-            require(msg.value >= (whitelistPrice * amount), "You do not have enough Ether to Purchase these items");
-        } else {
-            require(msg.value >= (price * amount), "You do not have enough Ether to Purchase these items");
+
+        // require(amount != 1, "Unable to batch mint this amount.");
+        if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
+            // owner is minting, they can mint up to 500 extra 
+            require((minted + amount) <= (maxSupply + 500), "Maximum supply has been reached"); // owner can mint extra 500 nfts in reserve
+            // mint no more than 25 at once to protect from losing gas by trying to batchMint too many at once 
+            require(amount <= 25, "Mint 25 or less NFTs at a time.");
+            // calculate ids & amounts, per the number of NFTs specified
+            uint256[] memory ids = new uint256[](amount);
+            uint256[] memory amounts = new uint256[](amount);
+            for (uint256 i=0; i < amount; i++) {
+                ids[i] = minted + i + 1; 
+                amounts[i] = 1;
+            }
+            minted += amount;
+            _mintBatch(msg.sender, ids, amounts, '');
         }
+        
+        else {
+            require(whitelistTier[msg.sender], "You are not whitelisted.");
+            require(msg.value >= (whitelistPrice * amount), "You do not have enough Ether to Purchase these items.");
+
+            if (whitelistTier[msg.sender] != 4) {
+                require(amount <= whitelistTier[msg.sender], "You cannot mint that many items.");
+            }
+
+            else {
+                require(amount <= 5, "You cannot mint that many items.");
+            }
+
+            require((minted + amount) <= maxSupply, "Maximum supply has been reached");
+            // require(amount <= 10, "You cannot mint more than 10 at once");
+            // calculate ids & amounts, per the number of NFTs specified
+            uint256[] memory ids = new uint256[](amount);
+                uint256[] memory amounts = new uint256[](amount);
+                for (uint256 i=0; i < amount; i++) {
+                    ids[i] = minted + i + 1; 
+                    amounts[i] = 1;
+                }
+                minted += amount;
+            _mintBatch(msg.sender, ids, amounts, '');
+        }
+
+        // if (whitelist[msg.sender]) {
+        //     // they're whitelisted, mint for whitelistprice
+
+        //     // make sure their tier allows them to mint as many hoopers as they're asking for
+        //     require(whitelistTier[msg.sender] >= amount, "You cannot mint that many Hoopers");
+        //     require(msg.value >= (whitelistPrice * amount), "You do not have enough Ether to Purchase these items");
+        // } else {
+        //     // they aren't whitelisted, mint for regular price
+
+        //     require(whitelistTier[msg.sender] >= amount, "You cannot mint that many Hoopers");
+        //     require(msg.value >= (price * amount), "You do not have enough Ether to Purchase these items");
+        // }
+
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
             // owner is minting, they can mint up to 500 extra 
             require((minted + amount) <= (maxSupply + 500), "Maximum supply has been reached"); // owner can mint extra 500 nfts in reserve
@@ -68,7 +131,7 @@ contract HooperCollectible is Ownable, ERC1155 {
             }
         } else {
             require((minted + amount) <= maxSupply, "Maximum supply has been reached");
-            require(amount <= 10, "You cannot mint more than 10 at once");
+            // require(amount <= 10, "You cannot mint more than 10 at once");
             // calculate ids & amounts, per the number of NFTs specified
             uint256[] memory ids = new uint256[](amount);
                 uint256[] memory amounts = new uint256[](amount);
