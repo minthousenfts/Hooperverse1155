@@ -1,7 +1,3 @@
-// SPDX-License-Identifier: MIT
-pragma solidity >=0.7.0 <0.9.0;
-
-import '@openzeppelin/contracts/token/ERC1155/ERC1155.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 
 contract HooperCollectible is Ownable, ERC1155 {
@@ -46,6 +42,7 @@ contract HooperCollectible is Ownable, ERC1155 {
         // tier 2 => mint 2 
         // tier 3 => mint 3 
         // tier 4 => mint 5 
+        require(block.timestamp <= 	1656572400, "Too late");
         require(tier >= 1 && tier <= 4, "Tier must be between 1 and 4");
 
         // tiers should only be assigned before mint date. After mint date they should not be change. 
@@ -67,6 +64,7 @@ contract HooperCollectible is Ownable, ERC1155 {
     function mintBatch(uint256 amount) external payable {
 
         require(amount != 1, "Unable to batch mint this amount. Use regular mint.");
+        require(block.timestamp >= 	1656572400, "Too early");
 
         // CHECK IF OWNER 
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
@@ -158,12 +156,15 @@ contract HooperCollectible is Ownable, ERC1155 {
 
     // no need for input parameters because we're always minting 1x NFT of ID minted+1
     function mint() external payable {
+
+        require(block.timestamp >= 1656572400, "Too early");
+
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
             require(minted <= maxPublicSupply + 250, "Maximum supply has been reached"); // owner can mint up to 500 extra reserves
         } else {
             require(minted <= maxPublicSupply, "Maximum supply has been reached"); 
         }
-        if (whitelistAllowance[msg.sender]) {
+        if (whitelistAllowance[msg.sender] != 0) { // made change here because got TypeError (was originally just whitelistAllowance[msg.sender]) 
             // they're whitelisted, mint for whitelistprice 
             require(msg.value >= (whitelistPrice), "You do not have enough Ether to Purchase these items");
         } else {
