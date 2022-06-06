@@ -13,6 +13,7 @@ contract HooperCollectible is Ownable, ERC1155 {
     uint256 private price = 90000000000000000; // (in wei) = 0.09 ETH 50000000000000000 
     uint256 private whitelistPrice =  80000000000000000; // (in wei) = 0.08 ETH
     mapping(address => uint256) public whitelistAllowance; // how much each address is allowed to mint
+    mapping(address => boolean) public alreadyMint;
     error tierOutOfRange();
     error updatingTierTooLate();
     error notWhitelisted();
@@ -226,7 +227,11 @@ contract HooperCollectible is Ownable, ERC1155 {
         // require(block.timestamp >= 1656572400, "Too early");
 
         if (block.timestamp < 1656572400) {
-            revert runtimeError("Too early");
+            revert runtimeError("Too early.");
+        }
+
+        if (alreadyMint[msg.sender] == true) {
+            revert runtimeError("You have already minted.");
         }
 
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
@@ -255,12 +260,15 @@ contract HooperCollectible is Ownable, ERC1155 {
         } else {
             // require(msg.value >= (price), "You do not have enough Ether to Purchase these items");
 
-            if (msg.value > price) {
+            if (msg.value < price) { // changed > to < because we should throw an error when msg.value is less than price not greater
                 revert runtimeError("You do not have enough Ether to Purchase these items.");
             }
         }
+
         _mint(msg.sender, (1 + minted), 1, '');
         minted++;
+        alreadyMint[msg.sender] = true;
+
     }
 
     // handling payments & withdrawals 
