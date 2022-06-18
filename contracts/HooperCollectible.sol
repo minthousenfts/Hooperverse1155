@@ -6,14 +6,17 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 
 contract HooperCollectible is Ownable, ERC1155 {
     // Base URI
-    string private baseURI;
-    string public name;
     uint256 public minted;
     uint private maxPublicSupply = 9749; // 9999 - 250 (reserve for owners)
     uint256 private price = 90000000000000000; // (in wei) = 0.09 ETH 50000000000000000 
     uint256 private whitelistPrice =  80000000000000000; // (in wei) = 0.08 ETH
+
+    string private baseURI;
+    string public name;
+
     mapping(address => uint256) public whitelistAllowance; // how much each address is allowed to mint
-    mapping(address => boolean) public alreadyMint;
+    mapping(address => bool) public alreadyMint;
+
     error tierOutOfRange();
     error updatingTierTooLate();
     error notWhitelisted();
@@ -63,7 +66,7 @@ contract HooperCollectible is Ownable, ERC1155 {
             revert runtimeError("Updating tier too late.");
         }
 
-        if (tier < 1 && tier > 4) {
+        if (tier < 1 || tier > 4) {
             revert runtimeError("Tier must be between 1 and 4.");
         }
 
@@ -156,9 +159,9 @@ contract HooperCollectible is Ownable, ERC1155 {
 
             // require(amount <= 10, "You cannot mint more than 10 at once");
 
-            if (amount > 10) {
+            // if (amount > 10) {
                 
-            }
+            // }
 
             // calculate ids & amounts, per the number of NFTs specified
             uint256[] memory ids = new uint256[](amount);
@@ -265,8 +268,8 @@ contract HooperCollectible is Ownable, ERC1155 {
             }
         }
 
-        _mint(msg.sender, (1 + minted), 1, '');
         minted++;
+        _mint(msg.sender, (1 + minted), 1, '');
         alreadyMint[msg.sender] = true;
 
     }
