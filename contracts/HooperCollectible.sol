@@ -15,7 +15,7 @@ contract HooperCollectible is Ownable, ERC1155 {
     string public name;
 
     mapping(address => uint256) public whitelistAllowance; // how much each address is allowed to mint
-    mapping(address => bool) public alreadyMint;
+    mapping(address => uint256) public howManyMinted;
 
     error tierOutOfRange();
     error updatingTierTooLate();
@@ -23,7 +23,7 @@ contract HooperCollectible is Ownable, ERC1155 {
 
     error runtimeError(string);
 
-    event Log(uint8[2], string); 
+    // event Log(uint8[2], string); 
 
     constructor()
         ERC1155(
@@ -100,9 +100,17 @@ contract HooperCollectible is Ownable, ERC1155 {
 
         // require(block.timestamp >= 	1656572400, "Too early");
 
-        if (block.timestamp < 1656572400) {
-            revert runtimeError("Too early");
+        if (whitelistAllowance[msg.sender] != 0) {
+            if (block.timestamp < 1656572400) { // whitelist time TBD
+                revert runtimeError("Too early");
+            }
+        } else {
+            if (block.timestamp < 1656572400) { // public mint time TBD
+                revert runtimeError("Too early");
+            }
         }
+
+        
 
         // CHECK IF OWNER 
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
@@ -134,6 +142,10 @@ contract HooperCollectible is Ownable, ERC1155 {
         else {
             // require(whitelistAllowance[msg.sender] > 0, "You're not whitelisted, so you can't mint more than 1.");
 
+            if (howManyMinted[msg.sender] + amount > whitelistAllowance[msg.sender]) {
+                revert runtimeError("You cannot mint that many items.");
+            }
+
             if (whitelistAllowance[msg.sender] <= 0) {
                 revert runtimeError("You're not whitelisted, so you can't mint more than 1.");
             }
@@ -159,10 +171,6 @@ contract HooperCollectible is Ownable, ERC1155 {
 
             // require(amount <= 10, "You cannot mint more than 10 at once");
 
-            // if (amount > 10) {
-                
-            // }
-
             // calculate ids & amounts, per the number of NFTs specified
             uint256[] memory ids = new uint256[](amount);
             uint256[] memory amounts = new uint256[](amount);
@@ -171,8 +179,8 @@ contract HooperCollectible is Ownable, ERC1155 {
                 amounts[i] = 1;
             }
             minted += amount;
-            whitelistAllowance[msg.sender] -= amount;
             _mintBatch(msg.sender, ids, amounts, '');
+            howManyMinted[msg.sender] += amount;
         }
         // USER ISN'T WHITELISTED. 
 
@@ -227,51 +235,63 @@ contract HooperCollectible is Ownable, ERC1155 {
     // no need for input parameters because we're always minting 1x NFT of ID minted+1
     function mint() external payable {
 
-        // require(block.timestamp >= 1656572400, "Too early");
-
-        if (block.timestamp < 1656572400) {
-            revert runtimeError("Too early.");
-        }
-
-        if (alreadyMint[msg.sender] == true) {
-            revert runtimeError("You have already minted.");
+        if (whitelistAllowance[msg.sender] != 0) {
+            if (block.timestamp < 1656572400) { // whitelist time TBD
+                revert runtimeError("Too early");
+            }
+        } else {
+            if (block.timestamp < 1656572400) { // public mint time TBD
+                revert runtimeError("Too early");
+            }
         }
 
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
-            // require(minted + 1 <= maxPublicSupply + 250, "Maximum supply has been reached"); // owner can mint up to 500 extra reserves
-
             if (minted + 1 > maxPublicSupply + 250) {
                 revert runtimeError("Maximum supply has been reached.");
             }
 
+            minted++;
+            _mint(msg.sender, (1 + minted), 1, '');
+
         } else {
             // require(minted + 1 <= maxPublicSupply, "Maximum supply has been reached."); 
+
+            if (whitelistAllowance[msg.sender] == howManyMinted[msg.sender]) {
+                revert runtimeError("You cannot mint any more.");
+            }
 
             if (minted + 1 > maxPublicSupply) {
                 revert runtimeError("Maximum supply has been reached.");
             }
 
-        }
-        if (whitelistAllowance[msg.sender] != 0) { // made change here because got TypeError (was originally just whitelistAllowance[msg.sender]) 
-            // they're whitelisted, mint for whitelistprice 
-            // require(msg.value >= (whitelistPrice), "You do not have enough Ether to Purchase these items");
+            // if (whitelistAllowance[msg.sender] != 0) {
+            //     if (block.timestamp < 1656572400) { // whitelist time TBD
+            //         revert runtimeError("Too early");
+            //     }
+            // } else {
+            //     if (block.timestamp < 1656572400) { // public mint time TBD
+            //         revert runtimeError("Too early");
+            //     }
+            // }
 
-            if (msg.value < whitelistPrice) {
-                revert runtimeError("You do not have enough Ether to Purchase these items.");
+            if (whitelistAllowance[msg.sender] != 0) { // made change here because got TypeError (was originally just whitelistAllowance[msg.sender]) 
+                // they're whitelisted, mint for whitelistprice 
+                // require(msg.value >= (whitelistPrice), "You do not have enough Ether to Purchase these items");
+
+                if (msg.value < whitelistPrice) {
+                    revert runtimeError("You do not have enough Ether to Purchase these items.");
+                }
+
+            } else {
+                if (msg.value < price) { // changed > to < because we should throw an error when msg.value is less than price not greater
+                    revert runtimeError("You do not have enough Ether to Purchase these items.");
+                }
             }
 
-        } else {
-            // require(msg.value >= (price), "You do not have enough Ether to Purchase these items");
-
-            if (msg.value < price) { // changed > to < because we should throw an error when msg.value is less than price not greater
-                revert runtimeError("You do not have enough Ether to Purchase these items.");
-            }
+            minted++;
+            _mint(msg.sender, (1 + minted), 1, '');
+            howManyMinted[msg.sender] += 1;
         }
-
-        minted++;
-        _mint(msg.sender, (1 + minted), 1, '');
-        alreadyMint[msg.sender] = true;
-
     }
 
     // handling payments & withdrawals 
