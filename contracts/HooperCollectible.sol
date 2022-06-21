@@ -235,8 +235,6 @@ contract HooperCollectible is Ownable, ERC1155 {
     // no need for input parameters because we're always minting 1x NFT of ID minted+1
     function mint() external payable {
 
-      
-
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
             if (minted + 1 > maxPublicSupply + 250) {
                 revert runtimeError("Maximum supply has been reached.");
@@ -258,8 +256,12 @@ contract HooperCollectible is Ownable, ERC1155 {
             }
         
             // require(minted + 1 <= maxPublicSupply, "Maximum supply has been reached."); 
-
-            if (whitelistAllowance[msg.sender] == howManyMinted[msg.sender]) {
+            
+            if (whitelistAllowance[msg.sender] != 0 && whitelistAllowance[msg.sender] == howManyMinted[msg.sender]) {
+                revert runtimeError("You cannot mint any more.");
+            }
+            
+            else if (whitelistAllowance[msg.sender] == 0 && howManyMinted[msg.sender] == 1) {
                 revert runtimeError("You cannot mint any more.");
             }
 
