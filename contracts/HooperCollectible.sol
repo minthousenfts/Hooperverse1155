@@ -100,18 +100,6 @@ contract HooperCollectible is Ownable, ERC1155 {
 
         // require(block.timestamp >= 	1656572400, "Too early");
 
-        if (whitelistAllowance[msg.sender] != 0) {
-            if (block.timestamp < 1656572400) { // whitelist time TBD
-                revert runtimeError("Too early");
-            }
-        } else {
-            if (block.timestamp < 1656572400) { // public mint time TBD
-                revert runtimeError("Too early");
-            }
-        }
-
-        
-
         // CHECK IF OWNER 
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
             // owner is minting, they can mint up to 250 extra 
@@ -140,6 +128,16 @@ contract HooperCollectible is Ownable, ERC1155 {
         }
         // CHECK IF WHITELISTED 
         else {
+
+            if (whitelistAllowance[msg.sender] != 0) {
+                if (block.timestamp < 1656572400) { // whitelist time TBD
+                    revert runtimeError("Too early");
+                }
+            } else {
+                if (block.timestamp < 1656572400) { // public mint time TBD
+                    revert runtimeError("Too early");
+                }
+            }
             // require(whitelistAllowance[msg.sender] > 0, "You're not whitelisted, so you can't mint more than 1.");
 
             if (howManyMinted[msg.sender] + amount > whitelistAllowance[msg.sender]) {
@@ -168,6 +166,8 @@ contract HooperCollectible is Ownable, ERC1155 {
             if (minted + amount > maxPublicSupply) {
                 revert runtimeError("Maximum supply has been reached.");
             }
+
+            
 
             // require(amount <= 10, "You cannot mint more than 10 at once");
 
