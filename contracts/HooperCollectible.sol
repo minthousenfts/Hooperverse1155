@@ -235,15 +235,7 @@ contract HooperCollectible is Ownable, ERC1155 {
     // no need for input parameters because we're always minting 1x NFT of ID minted+1
     function mint() external payable {
 
-        if (whitelistAllowance[msg.sender] != 0) {
-            if (block.timestamp < 1656572400) { // whitelist time TBD
-                revert runtimeError("Too early");
-            }
-        } else {
-            if (block.timestamp < 1656572400) { // public mint time TBD
-                revert runtimeError("Too early");
-            }
-        }
+      
 
         if (keccak256(abi.encodePacked((owner()))) == keccak256(abi.encodePacked(msg.sender))) {
             if (minted + 1 > maxPublicSupply + 250) {
@@ -254,6 +246,17 @@ contract HooperCollectible is Ownable, ERC1155 {
             _mint(msg.sender, (1 + minted), 1, '');
 
         } else {
+        
+            if (whitelistAllowance[msg.sender] != 0) {
+                if (block.timestamp < 1656572400) { // whitelist time TBD
+                    revert runtimeError("Too early");
+                }
+            } else {
+                if (block.timestamp < 1656572400) { // public mint time TBD
+                    revert runtimeError("Too early");
+                }
+            }
+        
             // require(minted + 1 <= maxPublicSupply, "Maximum supply has been reached."); 
 
             if (whitelistAllowance[msg.sender] == howManyMinted[msg.sender]) {
