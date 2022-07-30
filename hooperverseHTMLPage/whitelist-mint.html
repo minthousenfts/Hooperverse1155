@@ -201,7 +201,7 @@
     <script type="text/javascript">
 
         // contract address & abi
-        const CONTRACT_ADDRESS = '0xe421Bb7dffF416C65C4f1C9fFA20C7617eE151Dc'; //needs to change to new contract; make var public
+        const CONTRACT_ADDRESS = '0xE3bBddfb8fA9bAb28985bf29F62f79A8A5108A38'; //needs to change to new contract; make var public
         const ABI = {
             "deploy": {
                 "VM:-": {
@@ -25773,7 +25773,6 @@
                 window.web3 = new Web3(ethereum);
 
                 // const provider = new ethers.providers.Web3Provider(ethereum);
-                // console.log(provider);
                 // const signer = provider.getSigner();
                 // const provider = new ethers.providers.JsonRpcProvider()
                 // const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, ABI.abi, provider);
@@ -25781,7 +25780,6 @@
 
                 ethereum.enable()
                     .then(() => {
-                        console.log("Ethereum enabled");
 
                         web3.eth.getAccounts(function (err, acc) {
                             if (err != null) {
@@ -25790,7 +25788,6 @@
                             }
                             if (acc.length > 0) {
                                 account = acc[0]; // got the account address 
-                                console.log("Using account: " + acc);
                             }
                         });
                     })
@@ -25803,7 +25800,7 @@
             }
         });
         // finished connecting to web3 provider 
-        console.log('Successfully attempted to connect to web3 wallet ');
+        // console.log('Successfully attempted to connect to web3 wallet ');
         
         // connect to contract 
         const provider = new ethers.providers.Web3Provider(ethereum);
@@ -25814,23 +25811,17 @@
 
         window.addEventListener('load', async () => {
 
-            console.log('load');
-
             minted = await connectedContract.minted();
 
             const mintAllowance = await connectedContract.getMintAllowance(account);
-
-            console.log(mintAllowance);
 
             let amountUserMinted = await connectedContract.getAmountMinted(account);
 
             if (mintAllowance == 0) {
                 howManyMoreUserCanMint = 1 - amountUserMinted;
-                console.log('if: ' + howManyMoreUserCanMint);
             }
             else {
                 howManyMoreUserCanMint = mintAllowance - amountUserMinted;
-                console.log('else: ' + howManyMoreUserCanMint)
             }
 
             renderAfterMintingVariablesRetrieved();
@@ -25838,9 +25829,10 @@
         });
 
         function renderAfterMintingVariablesRetrieved() {
-            const HTMLRenderAfterMintingVariablesRetrieved = '<div class="body-wrap" id="body-wrap"><div class="minting-wrapper"><h2 class="mint-hoopers-title">Mint Your Hoopers</h2><div class="change-num-to-mint"><div class="add-or-subtract"><span><i class="fa fa-minus-circle" onclick="decrementCount()" id="decrement-count"></i></span> </div><div class="num-minting"><span id="num-to-mint">1</span></div><div class="add-or-subtract"><span><i class="fa fa-plus-circle" onclick="incrementCount()" id="increment-count"></i></span></div></div><div class="mint-price">Price is 0.08 ETH. Mint up to 5 hoopers.</div><div class="button-wrapper"><button id="mint-nft" class="btn btn-semi-transparent btn-glow" onclick="askContractToMintNft()">Mint Now</button></div><div class="total-mint-price"><i>Total price:&nbsp;<strong><span id="total-mint-price-ETH">0.08</span>&nbsp;ETH</strong></i></div><div class="num-minted"><span id="num-minted">0</span>/10000 Minted</div><span class="error-display" id="error-msg"></span></div></div>'
+            const HTMLRenderAfterMintingVariablesRetrieved = '<div class="body-wrap" id="body-wrap"><div class="minting-wrapper"><h2 class="mint-hoopers-title">Mint Your Hoopers</h2><div class="change-num-to-mint"><div class="add-or-subtract"><span><i class="fa fa-minus-circle" onclick="decrementCount()" id="decrement-count"></i></span> </div><div class="num-minting"><span id="num-to-mint">1</span></div><div class="add-or-subtract"><span><i class="fa fa-plus-circle" onclick="incrementCount()" id="increment-count"></i></span></div></div><div class="mint-price">Price is 0.08 ETH. Mint up to <span id="num-able-to-mint"></span> more hoopers.</div><div class="button-wrapper"><button id="mint-nft" class="btn btn-semi-transparent btn-glow" onclick="askContractToMintNft()">Mint Now</button></div><div class="total-mint-price"><i>Total price:&nbsp;<strong><span id="total-mint-price-ETH">0.08</span>&nbsp;ETH</strong></i></div><div class="num-minted"><span id="num-minted">0</span>/10000 Minted</div><span class="error-display" id="error-msg"></span></div></div>'
             document.getElementById('body-wrap').innerHTML = HTMLRenderAfterMintingVariablesRetrieved;
             document.getElementById("num-minted").innerHTML = parseInt(minted._hex, 16);
+            document.getElementById("num-able-to-mint").innerHTML = howManyMoreUserCanMint;
         }
 
         
@@ -25944,8 +25936,6 @@
 
         function incrementCount() {
 
-            console.log('user can mint ' + howManyMoreUserCanMint + ' more');
-
             if (numToMint < howManyMoreUserCanMint) {
                 numToMint += 1;
                 document.getElementById('num-to-mint').innerText = numToMint;
@@ -25971,36 +25961,6 @@
             document.getElementById('total-mint-price-ETH').innerText = totalMintPrice;
 
         }
-
-        // function numberUserMintingCheck() {
-
-        //     console.log('check')
-
-        //     if (howManyMoreUserCanMint == 0) {
-        //         // figure out what to do here
-        //         console.log('cannot mint any more')
-        //     }
-
-        //     else {
-        //         if (numToMint == 1) {
-        //             document.getElementById('decrement-count').onclick = '';
-        //             console.log('numtomint is 1')
-        //         }
-        //         else {
-        //             document.getElementById('decrement-count').onclick = "decrementCount()";
-        //             console.log('numtomint is not 1')
-        //         }
-
-        //         if (numToMint == howManyMoreUserCanMint) {
-        //             document.getElementById('increment-count').onclick = '';
-        //             console.log('numtomint is max')
-        //         }
-        //         else {
-        //             document.getElementById('increment-count').onclick = "incrementCount()";
-        //             console.log('numtomint is not max');
-        //         }
-        //     }
-        // }
 
     </script>
 
